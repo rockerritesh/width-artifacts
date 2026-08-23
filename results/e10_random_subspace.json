@@ -1,0 +1,31 @@
+{
+ "model": "dinov2-base",
+ "attr": "orientation",
+ "l_inj": 11,
+ "l_read": 12,
+ "random": {
+  "13": {
+   "seeds": [
+    0.1749,
+    0.2179,
+    0.2129,
+    -0.1004,
+    0.0054
+   ],
+   "mean": 0.1021,
+   "sd": 0.1275
+  },
+  "55": {
+   "seeds": [
+    0.0806,
+    0.6005,
+    0.2176,
+    0.0234,
+    0.2871
+   ],
+   "mean": 0.2418,
+   "sd": 0.2025
+  }
+ },
+ "note": "random orthonormal K-subspace, same swap toward target prototype as the attribute-subspace sweep"
+}

@@ -1,0 +1,138 @@
+{
+  "model": "google/paligemma-3b-mix-224",
+  "l_inj": 24,
+  "orientation": {
+    "prompt": "is the object facing toward or away from the camera?",
+    "bprompt": "which way is the object facing?",
+    "tword": "away",
+    "sword": "toward",
+    "kstar": 54,
+    "p_src_base": 0.9266597852110863,
+    "p_tgt_base": 0.9146150462329388,
+    "gen_src": [
+      "down",
+      "left",
+      "right",
+      "down",
+      "down",
+      "down"
+    ],
+    "gen_tgt": [
+      "down",
+      "left",
+      "down",
+      "down",
+      "down",
+      "down"
+    ],
+    "ranks": [
+      1,
+      4,
+      16,
+      54,
+      64,
+      128
+    ],
+    "p_steer": [
+      0.9268580116331577,
+      0.9272718131542206,
+      0.9211396090686321,
+      0.9258655458688736,
+      0.9289714954793453,
+      0.9079070724546909
+    ],
+    "gen_steer": {
+      "1": [
+        "down",
+        "left",
+        "right",
+        "down",
+        "down",
+        "down"
+      ],
+      "54": [
+        "down",
+        "left",
+        "right",
+        "down",
+        "down",
+        "down"
+      ],
+      "128": [
+        "down",
+        "left",
+        "left",
+        "down",
+        "down",
+        "down"
+      ]
+    }
+  },
+  "size": {
+    "prompt": "is the object small or large?",
+    "bprompt": "what is the size of the object?",
+    "tword": "large",
+    "sword": "small",
+    "kstar": 13,
+    "p_src_base": 0.01733396436611656,
+    "p_tgt_base": 0.3355288418242708,
+    "gen_src": [
+      "small",
+      "20",
+      "1",
+      "1.67 nm",
+      "18",
+      "small"
+    ],
+    "gen_tgt": [
+      "1",
+      "small",
+      "1",
+      "unanswerable",
+      "unanswerable",
+      "unanswerable"
+    ],
+    "ranks": [
+      1,
+      4,
+      13,
+      16,
+      64,
+      128
+    ],
+    "p_steer": [
+      0.018822416619514115,
+      0.017468421283410862,
+      0.013257678569061682,
+      0.014089155272813514,
+      0.017852308665169403,
+      0.022156819235533476
+    ],
+    "gen_steer": {
+      "1": [
+        "small",
+        "20",
+        "1",
+        "1.67 km",
+        "1",
+        "small"
+      ],
+      "13": [
+        "small",
+        "2",
+        "1",
+        "1.25 cm",
+        "1 inch",
+        "small"
+      ],
+      "128": [
+        "1",
+        "2",
+        "1 inch",
+        "1",
+        "1 inch",
+        "1"
+      ]
+    }
+  }
+}

@@ -117,6 +117,12 @@ SER = [("GPT-2 · heads", w_h, e_h, BLUE, "o"),
        ("Llama-8B · layers", w_lay, e_lay, ORANGE, "s"),
        ("DINOv2 · orientation", np.array(v["ranks"], float),
         np.array(v["orientation"]["closed"], float), GREEN, "^")]
+# representation-side width, measured with no intervention (reviewer vd7n: the
+# (1, 0.95) point is true by construction; these points are not). IOI heads have
+# no representation-side width, so they get none.
+_pb = json.load(open(f"{ROOT}/interp4discovery-neurips2026/results/eB_probe_transfer.json"))
+KREPR = {"Llama-8B · layers": float(_pb["mean_states"]["band_width_mean"]),
+         "DINOv2 · orientation": float(v["orientation"]["kstar"])}
 
 axA.axhspan(0.08, 0.12, color="#eeede9", zorder=0, lw=0)
 axA.axvline(1.0, color=MUTED, lw=0.8, ls=(0, (4, 3)))
@@ -126,13 +132,20 @@ for lab, w, e, c, mk in SER:
     x = w / ks
     keep = x <= 1.75
     axA.plot(x[keep], e[keep], color=c, lw=1.7, marker=mk, ms=3.8, mew=0,
-             zorder=4, label=f"{lab} ($k^*{{=}}{ks:.0f}$)")
+             zorder=4, label=f"{lab} ($k^*_{{\\mathrm{{eff}}}}{{=}}{ks:.0f}$)")
     axA.plot(x[0], e[0], marker=mk, ms=6.2, mfc=SURFACE, mec=c, mew=1.5, zorder=6)
+    if lab in KREPR:
+        # a tick on the top strip, not a point on the curve: the Llama sweep ends
+        # at 14 < 15, so an on-curve point would be extrapolated
+        axA.plot(KREPR[lab] / ks, 1.075, marker="v", ms=5.2, mfc=c, mec=INK,
+                 mew=0.4, zorder=7, clip_on=False)
+axA.text(1.22, 1.075, "$k^*_{\\mathrm{repr}}$ (no intervention)",
+         fontsize=5.8, color=INK, va="center")
 axA.set_xlim(-0.04, 1.78)
 axA.set_ylim(-0.03, 1.13)
 axA.set_yticks([0, 0.25, 0.5, 0.75, 0.95])
 axA.set_yticklabels(["0", ".25", ".50", ".75", ".95"])
-axA.set_xlabel("intervention width / $k^*$", labelpad=2)
+axA.set_xlabel("intervention width / $k^*_{\\mathrm{eff}}$", labelpad=2)
 axA.set_ylabel("fraction of achievable effect", labelpad=3)
 axA.grid(axis="y", color=GRID, lw=0.5)
 axA.set_axisbelow(True)

@@ -220,9 +220,13 @@ for name, attr, kr, e1, ke, emax in rows_v:
     t.append(f"{name} L11 & {attr} & {kr} & {e1:.2f} & "
              f"{fnum(ke, 0)} & {emax:.2f} & {verdict} \\\\")
 t.append(r"\midrule")
-med_f1 = float(np.median([r[3] for r in rows_h]))
-t.append(f"7 LMs (Fig.~2) & induction writers & 2--9 & {med_f1:.2f} (median) & "
-         f"$n_w{{-}}(0..2)$ & 1.00 & width-limited \\\\")
+# criterion-free widths (E12, joint greedy): the criterion-only k*_eff was circular
+e12 = json.load(open(RES / "e12_head_width.json"))
+_j = [v for k, v in e12.items() if isinstance(v, dict) and "joint_k_eff" in v]
+med_w1 = float(np.median([v["joint_w1"] for v in _j]))
+t.append(f"7 LMs (Fig.~2) & induction writers & 2--9$^{{\\S}}$ & {med_w1:.2f} (median) & "
+         f"{min(v['joint_k_eff'] for v in _j)}--{max(v['joint_k_eff'] for v in _j)} & "
+         f"1.00 & width-limited \\\\")
 t.append(r"\midrule")
 t.append(f"GPT-2 IOI & head coalition & 9 & {e_h[0]:.2f} & "
          f"{float(M['GptKstarEff']):.0f} & {e_h.max():.2f} & width-limited \\\\")

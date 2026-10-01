@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Intervention Was Too Narrow</title>
+<meta name="description" content="Mechanism width as a precondition for interpretability-driven discovery. Sumit Yadav, Basanta Joshi. NeurIPS 2026 Workshop on Interpretability for Discovery.">
+<meta property="og:title" content="Your Intervention Was Too Narrow: Mechanism Width as a Precondition for Interpretability-Driven Discovery">
+<meta property="og:description" content="One direction, one layer, one head recovers only ~10% of the achievable causal effect. A width-1 null is an underpowered test, not evidence of absence.">
+<meta property="og:image" content="assets/fig1_main.png">
+<style>
+  :root {
+    --bg: #fbfaf7;
+    --surface: #ffffff;
+    --plate: #fcfcfb;
+    --ink: #1b1a17;
+    --muted: #5b5850;
+    --faint: #8a867c;
+    --rule: #e3e0d8;
+    --accent: #b4462a;
+    --accent-soft: #f6e7e1;
+    --blue: #2a78d6;
+    --orange: #eb6834;
+    --green: #1a8f6a;
+    --purple: #8b3fb0;
+    --code-bg: #f3f1ec;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161513; --surface: #1e1d1a; --plate: #fcfcfb; --ink: #ece9e2;
+      --muted: #b3aea3; --faint: #8b877d; --rule: #34322d; --accent: #e7805f;
+      --accent-soft: #3a2620; --code-bg: #24221f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161513; --surface: #1e1d1a; --plate: #fcfcfb; --ink: #ece9e2;
+    --muted: #b3aea3; --faint: #8b877d; --rule: #34322d; --accent: #e7805f;
+    --accent-soft: #3a2620; --code-bg: #24221f;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); font-size: 17px; line-height: 1.62;
+  }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+  .wide { max-width: 1040px; }
+
+  header.hero { padding: 64px 0 36px; border-bottom: 1px solid var(--rule); }
+  .venue {
+    display: inline-block; font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 18px;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 600; font-size: clamp(30px, 5vw, 46px);
+    line-height: 1.12; margin: 0 0 10px; letter-spacing: -.01em;
+  }
+  .subtitle {
+    font-family: var(--serif); font-size: clamp(19px, 2.6vw, 24px); color: var(--muted);
+    margin: 0 0 26px; line-height: 1.35;
+  }
+  .authors { font-size: 18px; margin: 0; }
+  .authors span + span::before { content: "·"; color: var(--faint); margin: 0 .55em; }
+  .affil { color: var(--muted); font-size: 15px; margin: 4px 0 0; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px;
+    border: 1px solid var(--rule); border-radius: 999px; background: var(--surface);
+    color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 500;
+    transition: border-color .15s, background .15s;
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+
+  section { padding: 44px 0; border-bottom: 1px solid var(--rule); }
+  section:last-of-type { border-bottom: 0; }
+  h2 {
+    font-family: var(--serif); font-weight: 600; font-size: 27px; margin: 0 0 16px;
+    letter-spacing: -.005em;
+  }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  p { margin: 0 0 14px; }
+  .lede {
+    font-family: var(--serif); font-size: clamp(20px, 2.6vw, 24px); line-height: 1.45;
+    margin: 0; border-left: 3px solid var(--accent); padding-left: 18px;
+  }
+
+  figure { margin: 0; }
+  .plate {
+    background: var(--plate); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 14px; overflow: hidden;
+  }
+  .plate img { display: block; width: 100%; height: auto; }
+  figcaption { color: var(--muted); font-size: 14.5px; margin-top: 10px; line-height: 1.5; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 18px 18px 16px;
+  }
+  .stat .num { font-family: var(--serif); font-size: 34px; line-height: 1; font-weight: 600; }
+  .stat .lab { font-size: 14px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  .stat .who { font-size: 12.5px; color: var(--faint); margin-top: 6px; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px;
+  }
+  .card .tag {
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 8px;
+  }
+  .card p { font-size: 15px; color: var(--muted); margin: 0; }
+
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 6px 0 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  th { font-size: 13px; font-weight: 600; color: var(--muted); }
+  td.n, th.n { text-align: right; }
+  tr.hl td { background: var(--accent-soft); }
+  .note { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+  ol.protocol { counter-reset: s; list-style: none; padding: 0; margin: 0; }
+  ol.protocol li {
+    counter-increment: s; position: relative; padding: 0 0 14px 46px; margin: 0;
+  }
+  ol.protocol li::before {
+    content: counter(s); position: absolute; left: 0; top: 0; width: 30px; height: 30px;
+    border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    font-weight: 700; font-size: 14px; display: grid; place-items: center;
+  }
+
+  .gallery { display: grid; gap: 28px; }
+
+  pre {
+    background: var(--code-bg); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 16px 18px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px;
+    line-height: 1.55; margin: 0;
+  }
+  .bib { position: relative; }
+  .copy {
+    position: absolute; top: 10px; right: 10px; font: 500 13px var(--sans);
+    padding: 5px 11px; border-radius: 6px; border: 1px solid var(--rule);
+    background: var(--surface); color: var(--ink); cursor: pointer;
+  }
+  .copy:hover { border-color: var(--accent); }
+
+  footer { padding: 28px 0 48px; color: var(--faint); font-size: 14px; }
+  .theme {
+    position: fixed; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--rule); background: var(--surface); color: var(--ink);
+    cursor: pointer; display: grid; place-items: center;
+  }
+  .theme svg { width: 17px; height: 17px; }
+
+  @media (max-width: 720px) {
+    body { font-size: 16px; }
+    .wrap { padding: 0 16px; }
+    header.hero { padding: 52px 0 28px; }
+    .stats, .cards { grid-template-columns: 1fr; }
+    section { padding: 34px 0; }
+    .plate { padding: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="theme" id="theme" aria-label="Toggle light or dark theme">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+</button>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="venue">NeurIPS 2026 · Workshop on Interpretability for Discovery</div>
+    <h1>Your Intervention Was Too Narrow</h1>
+    <p class="subtitle">Mechanism Width as a Precondition for Interpretability-Driven Discovery</p>
+    <p class="authors"><span>Sumit Yadav</span><span>Basanta Joshi</span></p>
+    <p class="affil">Pulchowk Campus, Institute of Engineering, Tribhuvan University, Nepal</p>
+    <div class="links">
+      <a class="btn primary" href="paper.pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        Paper (PDF)
+      </a>
+      <a class="btn" href="https://github.com/rockerritesh/width-artifacts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>
+        Code &amp; artifacts
+      </a>
+      <a class="btn" href="#cite">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5H3v8h4"/><path d="M14 21c3 0 7-1 7-8V5h-7v8h4"/></svg>
+        BibTeX
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <p class="lede">When an intervention on one direction, one layer, or one attention head changes
+      nothing, the usual conclusion is that the part is not involved. Across three unrelated
+      systems, that test recovers only about a tenth of the effect it is looking for. A width-1
+      null is an underpowered test, not evidence of absence.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap wide">
+      <figure>
+        <div class="plate"><img src="assets/fig1_main.png" alt="Top: a mechanism drawn as a bundle of k-star strands; intervening on one strand captures 10 percent of the effect, on all k-star strands 95 percent, and when the reader is disconnected no width helps. Bottom left: width sweeps for GPT-2 heads, Llama-8B layers and DINOv2 orientation directions rise together from about 0.1 at width 1 to 0.95 at their own k-star. Bottom right: in PaliGemma the representation gap closes to 81 percent while the language model's readout stays near zero." loading="lazy"></div>
+        <figcaption><strong>Figure 1.</strong> (a) Width sweeps at three granularities, normalized by
+        each mechanism's own k*<sub>eff</sub>. Passing through (1, 0.95) holds by construction; the
+        evidence is everything left of it, and where the intervention-free k*<sub>repr</sub>
+        (triangles) lands. (b) The readout boundary: PaliGemma's representation moves while its
+        answer does not.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>The standard unit recovers about 10%</h2>
+      <div class="stats">
+        <div class="stat">
+          <div class="num">8.6%</div>
+          <div class="lab">one attention head, IOI circuit sufficiency</div>
+          <div class="who"><span class="dot" style="background:var(--blue)"></span>GPT-2 small · k*<sub>eff</sub> = 8.6 heads</div>
+        </div>
+        <div class="stat">
+          <div class="num">9.6%</div>
+          <div class="lab">one decoder layer removed</div>
+          <div class="who"><span class="dot" style="background:var(--orange)"></span>Llama-3.1-8B · k*<sub>eff</sub> = 13 layers</div>
+        </div>
+        <div class="stat">
+          <div class="num">11.1%</div>
+          <div class="lab">rank-1 steering of orientation</div>
+          <div class="who"><span class="dot" style="background:var(--green)"></span>DINOv2 · k*<sub>eff</sub> = 53 directions</div>
+        </div>
+      </div>
+      <p class="note">Widening each intervention to its mechanism's width k* recovers 95–100% of
+      the achievable effect.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Abstract</h2>
+      <p>Interpretability-driven discovery rests on interventions: a part is credited with a
+      function when perturbing it changes behavior, and dismissed when nothing happens. We show
+      that the field's standard intervention unit (one direction, one layer, one attention head)
+      recovers only ≈10% of the achievable causal effect in three unrelated testbeds, one task
+      each: rank-1 steering in vision encoders (0.111), single-layer ablation in Llama-3.1-8B
+      (0.096), and single-head sufficiency in GPT-2's IOI circuit (0.086). The mechanism's width
+      k* can be measured <em>before</em> intervening, and widening the intervention to k*
+      recovers 95–100%. The effect is about width itself: a 12-layer band does 7.5× the additive
+      damage prediction, random subsets track contiguous bands, and pushing past k* destroys
+      object identity. Across 12 language models, whether a single-unit test works is predicted
+      by a cliff in the writer-score ladder (ρ = 0.81). Width is necessary, not sufficient: at a
+      documented <em>readout boundary</em>, 81% of a representation gap closes while the
+      consumer's output moves ≈0, though it reads the attribute when prompted. A negative result
+      at standard width is an underpowered test, not evidence of absence; a cheap protocol (sweep
+      width, compare k*<sub>repr</sub> to k*<sub>eff</sub>, run matched controls) tells the
+      difference before a discovery claim is made.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Two widths, three verdicts</h2>
+      <p><strong>k*<sub>repr</sub></strong> is read from the representation alone, with no
+      intervention. <strong>k*<sub>eff</sub></strong> is the smallest intervention reaching 95% of
+      the achievable effect. Their relation classifies a failed intervention:</p>
+      <div class="cards">
+        <div class="card">
+          <div class="tag" style="color:var(--green)">Width-limited</div>
+          <p>k*<sub>eff</sub> exists and sits near k*<sub>repr</sub>. The standard test was simply
+          too narrow; widening fixes it. DINOv2 orientation: 49 vs 53.</p>
+        </div>
+        <div class="card">
+          <div class="tag" style="color:var(--purple)">Readout-limited</div>
+          <p>The representation moves, the consumer does not. No width helps; change the handle.
+          PaliGemma: 81% of the gap closed, captions invariant.</p>
+        </div>
+        <div class="card">
+          <div class="tag" style="color:var(--orange)">Basis-limited</div>
+          <p>Small k*<sub>repr</sub> but no saturating sweep: a curved, nearly one-dimensional
+          manifold a linear handle grips poorly. DINOv2 size peaks at 0.40.</p>
+        </div>
+      </div>
+      <p class="note">Varying all four analytic thresholds over 81 settings never moves a system
+      between these classes (paper, Appendix B).</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Role criteria are width choices too</h2>
+      <p>Counting heads that pass a role criterion (here, previous-token score ≥ 0.5 × max) is the
+      obvious representation-side width for attention heads. Selecting heads with no role score,
+      by greedily adding whichever upstream head does the most damage <em>jointly</em> with those
+      already chosen, shows the count is not reliable in either direction.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Model</th><th class="n">Criterion heads</th><th class="n">k*<sub>eff</sub> (joint greedy)</th><th class="n">Overlap</th><th class="n">Criterion set's share</th><th class="n">Width 1</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>GPT-2 small</td><td class="n">2</td><td class="n">10</td><td class="n">2/2</td><td class="n">0.51</td><td class="n">0.34</td></tr>
+            <tr><td>GPT-2 medium</td><td class="n">6</td><td class="n">21</td><td class="n">6/6</td><td class="n">0.43</td><td class="n">0.03</td></tr>
+            <tr><td>GPT-2 large</td><td class="n">7</td><td class="n">14</td><td class="n">5/7</td><td class="n">0.32</td><td class="n">0.03</td></tr>
+            <tr class="hl"><td>GPT-2 XL</td><td class="n">9</td><td class="n">22</td><td class="n">0/9</td><td class="n">0.20</td><td class="n">0.01</td></tr>
+            <tr><td>Pythia-410m</td><td class="n">5</td><td class="n">2</td><td class="n">4/5</td><td class="n">0.98</td><td class="n">0.80</td></tr>
+            <tr><td>Pythia-1.4b</td><td class="n">4</td><td class="n">8</td><td class="n">4/4</td><td class="n">0.85</td><td class="n">0.24</td></tr>
+            <tr><td>Llama-3.2-1B</td><td class="n">7</td><td class="n">8</td><td class="n">3/7</td><td class="n">0.70</td><td class="n">0.33</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">In GPT-2 the criterion finds the right heads first but stops at 20–51% of the
+      mechanism; in GPT-2 XL it shares none of the first nine. Measured against this
+      criterion-free mechanism, the writer-ladder cliff predicts width-1 success with
+      ρ = 0.89 (p = 0.007, n = 7).</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Before reporting an interventional null</h2>
+      <ol class="protocol">
+        <li><strong>Measure k*<sub>repr</sub></strong> from the representation, with no intervention.</li>
+        <li><strong>Sweep width past it</strong> and locate k*<sub>eff</sub>, the width reaching 95% of the achievable effect.</li>
+        <li><strong>Run matched controls:</strong> random units of equal width and magnitude, plus a prompted capability check on the consumer.</li>
+        <li><strong>Classify:</strong> saturates near k*<sub>repr</sub> → width-limited; representation moves but the consumer does not → readout-limited; linear handles fail on a low-stable-rank manifold → basis-limited. Only then interpret the null.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap wide">
+      <h2>More results</h2>
+      <div class="gallery">
+        <figure>
+          <div class="plate"><img src="assets/fig2.png" alt="Left: ablating the top-k previous-token writers versus matched control heads across language models; the effect grows with width in every model. Right: the fraction realized at k equals 1 rises with the writer-ladder cliff ratio." loading="lazy"></div>
+          <figcaption><strong>Figure 2.</strong> Universality across 12 language models (GPT-2,
+          Pythia, Qwen2, Llama). Whether the single-unit test works is predicted by the
+          writer-ladder cliff (ρ = 0.81, p = 0.001).</figcaption>
+        </figure>
+        <figure>
+          <div class="plate"><img src="assets/fig3.png" alt="Three control panels: band removal is superadditive, reaching 7.5 times the additive prediction at 12 layers; random layer subsets track contiguous bands; steering size past k-star collapses object identity." loading="lazy"></div>
+          <figcaption><strong>Figure 3.</strong> The effect tracks width, not magnitude or
+          position: a 12-layer band does 7.5× the additive prediction, random subsets track
+          contiguous bands, and over-widening past k* collapses identity (0.97 → 0.15).</figcaption>
+        </figure>
+        <figure>
+          <div class="plate"><img src="assets/fig4.png" alt="PaliGemma tower steering: the representation gap closes across ranks while the language model's answer probability stays flat at three injection sites." loading="lazy"></div>
+          <figcaption><strong>Figure 4.</strong> The readout boundary in detail. The signal moves;
+          the handle's content is not what the consumer reads. Replacing the full token field
+          flips the answer, so the wall is specific to the pooled rank-K handle.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="cite">
+    <div class="wrap">
+      <h2>Citation</h2>
+      <div class="bib">
+        <button class="copy" id="copy" type="button">Copy</button>
+<pre id="bibtex">@inproceedings{yadav2026narrow,
+  title     = {Your Intervention Was Too Narrow: Mechanism Width as a
+               Precondition for Interpretability-Driven Discovery},
+  author    = {Yadav, Sumit and Joshi, Basanta},
+  booktitle = {NeurIPS 2026 Workshop on Interpretability for Discovery},
+  year      = {2026},
+  note      = {Non-archival}
+}</pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Sumit Yadav &amp; Basanta Joshi · Pulchowk Campus, IOE, Tribhuvan University ·
+  <a href="https://github.com/rockerritesh/width-artifacts">code &amp; artifacts</a></div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement, key = "width-theme";
+    try { var saved = localStorage.getItem(key); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+    document.getElementById("theme").addEventListener("click", function () {
+      var cur = root.getAttribute("data-theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      var next = cur === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem(key, next); } catch (e) {}
+    });
+    var btn = document.getElementById("copy");
+    btn.addEventListener("click", function () {
+      var text = document.getElementById("bibtex").innerText;
+      var done = function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1600); };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+    });
+  })();
+</script>
+</body>
+</html>

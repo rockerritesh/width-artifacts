@@ -1,0 +1,72 @@
+name: Project page
+
+# Build runs on every docs change and on demand; it only produces a private
+# workflow artifact. Deploy is opt-in (manual run with deploy=true) because a
+# Pages site is publicly reachable even when the repository is private.
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy to GitHub Pages (makes the site PUBLIC)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check page structure and local links
+        run: |
+          python3 - <<'PY'
+          import os, re, sys
+          from html.parser import HTMLParser
+          VOID = {"meta", "img", "br", "hr", "input", "link", "path"}
+          class P(HTMLParser):
+              def __init__(s):
+                  super().__init__(); s.stack, s.bad = [], []
+              def handle_starttag(s, t, a):
+                  if t not in VOID: s.stack.append(t)
+              def handle_endtag(s, t):
+                  if t in VOID: return
+                  if s.stack and s.stack[-1] == t: s.stack.pop()
+                  else: s.bad.append((t, s.getpos()))
+          html = open("docs/index.html").read()
+          p = P(); p.feed(html)
+          refs = set(re.findall(r'(?:src|href)="([^"#:]+)"', html))
+          missing = [r for r in refs if not os.path.exists(os.path.join("docs", r))]
+          print("local refs:", sorted(refs))
+          if p.stack or p.bad or missing:
+              print("unclosed:", p.stack, "mismatched:", p.bad, "missing:", missing)
+              sys.exit(1)
+          print("page OK")
+          PY
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

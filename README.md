@@ -4,7 +4,7 @@
 Sumit Yadav, Basanta Joshi — Pulchowk Campus, Institute of Engineering, Tribhuvan University, Nepal
 *NeurIPS 2026 Workshop on Interpretability for Discovery (Interp4Discovery), non-archival.*
 
-Project page: [`docs/index.html`](docs/index.html) · Paper: [`docs/paper.pdf`](docs/paper.pdf)
+Paper: [PDF](https://openreview.net/pdf?id=aDQHyo9kyh) · [OpenReview](https://openreview.net/forum?id=aDQHyo9kyh) · [NeurIPS poster](https://neurips.cc/virtual/2026/loc/atlanta/164229) · Project page: [`docs/index.html`](docs/index.html)
 
 > The field's standard intervention unit (one direction, one layer, one attention head) recovers
 > only ≈10% of the achievable causal effect in three unrelated testbeds. A negative result at
@@ -19,7 +19,7 @@ Project page: [`docs/index.html`](docs/index.html) · Paper: [`docs/paper.pdf`](
 - `results/` — one JSON/NPZ per experiment; `results/upstream/` holds the raw sweep artifacts
   (coalition lattice, width sweeps, steering sweeps) the analyses read.
 - `figures/` — the compiled figure PDFs.
-- `docs/` — project page and the camera-ready PDF.
+- `docs/` — project page.
 
 ## Camera-ready additions (reviewer feedback)
 
